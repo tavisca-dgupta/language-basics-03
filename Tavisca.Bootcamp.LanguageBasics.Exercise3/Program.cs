@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Linq;
+using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 namespace Tavisca.Bootcamp.LanguageBasics.Exercise1
 {
@@ -38,10 +40,101 @@ namespace Tavisca.Bootcamp.LanguageBasics.Exercise1
             Console.WriteLine(result);
         }
 
-        public static int[] SelectMeals(int[] protein, int[] carbs, int[] fat, string[] dietPlans)
+         public static int[] SelectMeals(int[] protein, int[] carbs, int[] fat, string[] dietPlans)
         {
-            // Add your code here.
-            throw new NotImplementedException();
+             int[] itemNumber=new int[dietPlans.Count()];
+             int[] calories=new int[protein.Count()];
+             int[] itemToEat=new int[protein.Count()];// store the number of all the items
+
+             for(int i=0;i<calories.Count();i++)
+             {
+                 calories[i]=(protein[i]*5)+(carbs[i]*5)+(fat[i]*9);
+                 itemToEat[i]=i;//as 1st your will have all the items to eat
+             }
+             for(int i=0;i<dietPlans.Count();i++)
+             {
+                 if(dietPlans[i].Equals(""))
+                 {
+                     itemNumber[i]=0;
+                 }
+                 else
+                 {
+                     char[] dietarray=dietPlans[i].ToCharArray();
+                     int[] item=getItemNumber(dietarray[0],protein,carbs,fat,calories,itemToEat).ToArray();
+                     if(dietarray.Count()==1)
+                     {
+                         itemNumber[i]=item[0];
+                     }
+                     else{
+                     for(int j=0;j<dietarray.Count();j++)
+                     {
+                         item=getItemNumber(dietarray[j],protein,carbs,fat,calories,item).ToArray();                         
+                         if(item.Count()==1||j+1==dietarray.Count())
+                         {
+                             itemNumber[i]=item[0];
+                             break;
+                         }
+                     }
+                     }
+                 }
+             }
+             return itemNumber;
+         }
+             
+        public static List<int> getItemNumber(char dietPlan,int[] protein, int[] carbs, int[] fat,int[] calories,int[] itemToEat)
+        {
+            List<int> itemConfig = new List<int>(); //go get the configuration of items a user can eat as per diet plan
+            switch(dietPlan)
+            {
+                case 'P':itemConfig=getItemConfig(itemToEat,protein);
+                return findItems(protein,itemConfig.Max());
+                break;
+                case 'p':itemConfig=getItemConfig(itemToEat,protein);
+                return findItems(protein,itemConfig.Min());
+                break;
+                case 'C':itemConfig=getItemConfig(itemToEat,carbs);
+                return findItems(carbs,itemConfig.Max());
+                break;
+                case 'c': itemConfig=getItemConfig(itemToEat,carbs);
+                return findItems(carbs,itemConfig.Min());
+                break;
+                case 'F': itemConfig=getItemConfig(itemToEat,fat);
+                return findItems(fat,itemConfig.Max());
+                break;
+                case 'f':itemConfig=getItemConfig(itemToEat,fat);
+                return findItems(fat,itemConfig.Min());
+                break;
+                case 'T':itemConfig=getItemConfig(itemToEat,calories);
+                return findItems(calories,itemConfig.Max());
+                break;
+                case 't':itemConfig=getItemConfig(itemToEat,calories);
+                return findItems(calories,itemConfig.Min());
+                break;
+                default: return null;
+                
+            }
+        }
+        public static List<int> findItems(int[] array,int val)
+        {
+            List<int> itemNumber = new List<int>(); 
+            for(int i=0;i<array.Length;i++){
+                if(array[i]==val)
+                {
+                    itemNumber.Add(i);
+                }
+            }
+            return itemNumber;
+        }
+        
+        public static List<int> getItemConfig(int[] itemToEat,int[] array)
+        {
+            List<int> item = new List<int>(); 
+            for(int i=0;i<itemToEat.Count();i++)
+            {
+                item.Add(array[itemToEat[i]]);                
+
+            }
+            return item;
         }
     }
 }
